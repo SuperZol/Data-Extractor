@@ -13,7 +13,7 @@ def unzip_xml_files(directory, file):
 
 
 def main():
-    zip_directory = sys.argv[1]
+    zip_directory = './zipped_files'
     for filename in os.listdir(zip_directory):
         if filename.endswith('.gz'):
             unzip_xml_files(zip_directory, filename)
