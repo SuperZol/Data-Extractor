@@ -5,7 +5,7 @@ import requests
 from lxml import html
 from datetime import datetime
 
-from Mega import Mega
+from crawler import Crawler_shops
 from Osherad import Osherad
 
 file_path = './urls.json'
@@ -15,11 +15,8 @@ DIRECTORY_NAME = "zip_files"
 def read_from_file(file_path):
     with open(file_path, 'r') as file:
         data = json.load(file)
-        urls = data['urls']
-    url_lst = []
-    for url in urls:
-        url_lst.append(url)
-    return url_lst
+        url_data = data.get('urls', [])  # Get the list of URLs and names
+    return url_data
 
 
 def create_zip_folder():
@@ -31,8 +28,11 @@ def create_zip_folder():
 def main():
     url_lst = read_from_file(file_path)
     create_zip_folder()
-    #Mega(url_lst[0], DIRECTORY_NAME)
-    Osherad(url_lst[1], DIRECTORY_NAME)
+    for item in url_lst:
+        url = item.get('url', '')  # Get the URL from the dictionary
+        name = item.get('name', 'Unknown')  # Get the name from the dictionary, default to 'Unknown'
+        Crawler_shops(url, DIRECTORY_NAME, name)
+    # Osherad(url_lst[1], DIRECTORY_NAME)
 
 
 if __name__ == '__main__':

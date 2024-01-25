@@ -1,1 +1,6 @@
-{"urls": ["http://publishprice.mega.co.il", "https://url.publishedprices.co.il/login"]}
+{
+  "urls": [
+    {"url": "http://publishprice.mega.co.il", "name": "Mega"},
+    {"url": "https://publishprice.ybitan.co.il/", "name": "Yenot_bitan"}
+  ]
+}

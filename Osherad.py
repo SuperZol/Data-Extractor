@@ -8,6 +8,7 @@ import requests
 import os
 import time
 from selenium import webdriver
+
 PATH = "C:/Program Files (x86)/chromedriver.exe"
 
 
@@ -15,14 +16,14 @@ class Osherad:
     def __init__(self, url, directory_name):
         self.url = url
         self.driver = webdriver.Chrome(service=Service(PATH))
+        self.file_url = ""
         self.driver.get(self.url)
         self.login()
-        time.sleep(5)
         self.directory_path = f'{directory_name}/{Osherad.__name__}'  # save it into Mega folder
         self.create_directory()
         self.start_requests()
-        time.sleep(50)
 
+        time.sleep(50)
 
     def create_directory(self):
         # Check if the subdirectory for this class instance exists, if not, create it
@@ -39,34 +40,45 @@ class Osherad:
 
     def start_requests(self):
         selenium_cookies = self.driver.get_cookies()
-        print(selenium_cookies)
-        requests_session = requests.Session()
-        for cookie in selenium_cookies:
-            requests_session.cookies.set(cookie['name'], cookie['value'])
+        requests_cookies = {cookie['name']: cookie['value'] for cookie in selenium_cookies}
+        response = requests.get(self.driver.current_url, stream=True, cookies=requests_cookies)
+        print(response.content)
 
-        response = requests_session.get("https://url.publishedprices.co.il/file")
-        print(response.text)
-        if response.ok:
-            # Save the response text to a file
-            with open("response_content.txt", "w", encoding="utf-8") as file:
-                file.write(response.text)
-            print("Response content saved to 'response_content.txt'")
+        lst = self.driver.find_elements(By.XPATH, "//a[contains(@href, '.gz') and not(contains(@title, 'NULL'))]")
+        for item in lst:
+            # Check if the URL is absolute or relative
+            self.file_url = self.driver.current_url + '/d/' + item.text.strip()
+            self.download_file()
 
-        # Now you can use the 'session' object to make requests that require authentication
-        if response.ok:
-            # Parse the HTML
-            tree = html.fromstring(response.content)
-            print(tree)
-            # Find all <a> elements with href containing ".gz"
-            links = tree.xpath("//a[contains(@href, '.gz')]")
-            for link in links:
-                file_url = link.get('href')
-                # Check if the URL is absolute or relative
-                self.file_url = self.url + '/' + file_url
-                self.download_file()
+        # print(selenium_cookies)
+        # requests_session = requests.Session()
+        # for cookie in selenium_cookies:
+        #     requests_session.cookies.set(cookie['name'], cookie['value'])
+        #
+        # response = requests_session.get("https://url.publishedprices.co.il/file")
+        # print(response.text)
+        # if response.ok:
+        #     # Save the response text to a file
+        #     with open("response_content.txt", "w", encoding="utf-8") as file:
+        #         file.write(response.text)
+        #     print("Response content saved to 'response_content.txt'")
+        # /file/d/Price7290103152017-001-202401250900.gz
+        # # Now you can use the 'session' object to make requests that require authentication
+        # if response.ok:
+        #     # Parse the HTML
+        #     tree = html.fromstring(response.content)
+        #     print(tree)
+        #     # Find all <a> elements with href containing ".gz"
+        #     links = tree.xpath("//a[contains(@href, '.gz') and not(contains(@title, 'NULL'))]")
+        #     for link in links:
+        #         file_url = link.get('href')
+        #         # Check if the URL is absolute or relative
+        #         self.file_url = self.url + '/' + file_url
+        #         self.download_file()
 
     def download_file(self):
         response = requests.get(self.file_url, stream=True)
+        print(self.file_url)
         # Extracts the file name from the URL. This is done by splitting the URL at each slash and taking the last part,
         # which is typically the file name.
         file_name = self.file_url.split('/')[-1]

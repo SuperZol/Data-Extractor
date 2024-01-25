@@ -4,11 +4,11 @@ from lxml import html
 from datetime import datetime
 
 
-class Mega:
-    def __init__(self, url, directory_name):
+class Crawler_shops:
+    def __init__(self, url, directory_name, super_name):
         self.url = url  # base url
         self.file_url = ""
-        self.directory_path = f'{directory_name}/{Mega.__name__}'  # save it into Mega folder
+        self.directory_path = f'{directory_name}/{super_name}'  # save it into Mega folder
         self.create_directory()
         self.url_with_current_date()
         self.start_requests()
