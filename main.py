@@ -1,12 +1,7 @@
 import json
 import os
-
 import Constants
-from crawler import Crawler_shops
-
-
-file_path = './urls.json'
-DIRECTORY_NAME = "zip_files"
+from crawler import CrawlerShops
 
 
 def read_from_file(file_path):
@@ -17,18 +12,17 @@ def read_from_file(file_path):
 
 
 def create_zip_folder():
-    # Check if the base directory exists, if not, create it
-    if not os.path.exists(Constants.DIRECTORY_NAME):
-        os.makedirs(Constants.DIRECTORY_NAME)
+    if not os.path.exists(Constants.ZIP_FILES_DIRECTORY):
+        os.makedirs(Constants.ZIP_FILES_DIRECTORY)
 
 
 def main():
-    url_lst = read_from_file(file_path)
+    url_lst = read_from_file(Constants.URL_FILES)
     create_zip_folder()
     for item in url_lst:
-        url = item.get(Constants.URL)  # Get the URL from the dictionary
-        name = item.get(Constants.NAME)  # Get the name from the dictionary, default to 'Unknown'
-        Crawler_shops(url, name)
+        url = item.get(Constants.URL)
+        name = item.get(Constants.NAME)
+        CrawlerShops(url, name)
 
 
 if __name__ == '__main__':
