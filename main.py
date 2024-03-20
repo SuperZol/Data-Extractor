@@ -1,7 +1,6 @@
 import json
-import os
 import Constants
-from crawler import CrawlerShops
+from crawler import Yenot_bitan, Victory
 
 
 def read_from_file(file_path):
@@ -11,18 +10,15 @@ def read_from_file(file_path):
     return url_data
 
 
-def create_zip_folder():
-    if not os.path.exists(Constants.ZIP_FILES_DIRECTORY):
-        os.makedirs(Constants.ZIP_FILES_DIRECTORY)
-
-
 def main():
     url_lst = read_from_file(Constants.URL_FILES)
-    create_zip_folder()
     for item in url_lst:
         url = item.get(Constants.URL)
         name = item.get(Constants.NAME)
-        CrawlerShops(url, name)
+        if "Yenot_bitan" in name:
+            Yenot_bitan(url, name)
+        elif "Victory" in name:
+            Victory(url, name)
 
 
 if __name__ == '__main__':
