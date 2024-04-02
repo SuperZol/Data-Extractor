@@ -25,11 +25,12 @@ class BaseCrawler:
             tree = html.fromstring(response.content)
             # Find all <a> elements with href containing ".gz"
             if self.super_name == 'Victory':
-                print("In Victory name")
+                print("Downloading Victory")
                 links = tree.xpath(Constants.DOWNLOAD_LINKS_VICTORY)
             else:
-                print("In Yenot_bitan name")
-                links = tree.xpath(Constants.DOWNLOAD_LINKS_YENOT_BITAN)
+                print("Downloading Yenot_bitan")
+                links = tree.xpath(Constants.DOWNLOAD_LINKS_YENOT_BITAN_FULL) + tree.xpath(
+                    Constants.DOWNLOAD_LINKS_YENOT_BITAN_STORES)
             for link in links:
                 file_url = link.get('href')
                 # Check if the URL is absolute or relative
@@ -56,7 +57,7 @@ class Victory(BaseCrawler):
         self.start_requests()
 
 
-class Yenot_bitan(BaseCrawler):
+class YenotBitan(BaseCrawler):
     def __init__(self, url, super_name):
         super().__init__(url, super_name)
         self.url_with_current_date()
