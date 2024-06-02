@@ -98,22 +98,18 @@ def add_lat_lng(parsed_super_markets):
         if store_lat is None or store_lng is None:
             city = store.get('City')
             address = store.get('Address')
-            zip_code = store.get('ZipCode')
-            if address:  # Ensure address is not None
+            if address:
                 api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-                store_lat, store_lng = geocode_address(address, city, zip_code, api_key)
+                store_lat, store_lng = geocode_address(address, city, api_key)
                 store['Latitude'] = store_lat
                 store['Longitude'] = store_lng
             else:
                 continue
 
 
-def geocode_address(address: str, city: str, zip_code: str, api_key: str):
-    if city != "unknown":
-        city_address = f"{address}" if city is None else f"{city} {address}"
-        full_address = f"{city_address}" if zip_code is None else f"{city_address} {zip_code}"
-    else:
-        full_address = f"{address}" if city is None else f"{city} {address}"
+def geocode_address(address: str, city: str, api_key: str):
+
+    full_address = f"{address}" if city is None else f"{city} {address}"
 
     endpoint = os.getenv("GOOGLE_MAPS_URL")
     params = {'address': full_address, 'key': api_key}
