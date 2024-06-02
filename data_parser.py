@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as Etree
-import Constants
+import constants
 from database import products_collection, super_markets_collection
 import requests
 import os
@@ -120,7 +120,7 @@ def geocode_address(address: str, city: str, api_key: str):
 
 
 def main():
-    parsed_prices, parsed_promos, parsed_super_markets = parse_xml_data(Constants.XML_FILES_DIRECTORY)
+    parsed_prices, parsed_promos, parsed_super_markets = parse_xml_data(constants.XML_FILES_DIRECTORY)
     store_data(parsed_prices, parsed_promos, parsed_super_markets)
 
 

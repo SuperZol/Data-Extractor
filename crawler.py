@@ -3,7 +3,7 @@ import requests
 from lxml import html
 from datetime import datetime
 
-import Constants
+import constants
 
 
 class BaseCrawler:
@@ -11,7 +11,7 @@ class BaseCrawler:
         self.url = url
         self.super_name = super_name
         self.file_url = ""
-        self.directory_path = f'{Constants.ZIP_FILES_DIRECTORY}/{self.super_name}'
+        self.directory_path = f'{constants.ZIP_FILES_DIRECTORY}/{self.super_name}'
         self.create_directory()
 
     def create_directory(self):
@@ -26,11 +26,11 @@ class BaseCrawler:
             # Find all <a> elements with href containing ".gz"
             if self.super_name == 'Victory':
                 print("Downloading Victory")
-                links = tree.xpath(Constants.DOWNLOAD_LINKS_VICTORY)
+                links = tree.xpath(constants.DOWNLOAD_LINKS_VICTORY)
             else:
                 print("Downloading Yenot_bitan")
-                links = tree.xpath(Constants.DOWNLOAD_LINKS_YENOT_BITAN_FULL) + tree.xpath(
-                    Constants.DOWNLOAD_LINKS_YENOT_BITAN_STORES)
+                links = tree.xpath(constants.DOWNLOAD_LINKS_YENOT_BITAN_FULL) + tree.xpath(
+                    constants.DOWNLOAD_LINKS_YENOT_BITAN_STORES)
             for link in links:
                 file_url = link.get('href')
                 # Check if the URL is absolute or relative
@@ -64,6 +64,6 @@ class YenotBitan(BaseCrawler):
 
     def url_with_current_date(self):
         current_date = datetime.now()
-        formatted_date = current_date.strftime(Constants.DATE_FORMAT)
+        formatted_date = current_date.strftime(constants.DATE_FORMAT)
         self.url = self.url + '/' + formatted_date
         self.start_requests()

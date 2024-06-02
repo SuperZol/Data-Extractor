@@ -1,5 +1,5 @@
 import json
-import Constants
+import constants
 from crawler import YenotBitan, Victory
 
 
@@ -11,10 +11,10 @@ def read_from_file(file_path):
 
 
 def main():
-    url_lst = read_from_file(Constants.URL_FILES)
+    url_lst = read_from_file(constants.URL_FILES)
     for item in url_lst:
-        url = item.get(Constants.URL)
-        name = item.get(Constants.NAME)
+        url = item.get(constants.URL)
+        name = item.get(constants.NAME)
         if "Yenot_bitan" in name:
             YenotBitan(url, name)
         elif "Victory" in name:

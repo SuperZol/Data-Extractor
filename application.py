@@ -2,7 +2,7 @@ import os
 import shutil
 import subprocess
 import time
-import Constants
+import constants
 
 
 def delete_folders(zip_dir, xml_dir):
@@ -36,8 +36,8 @@ if __name__ == "__main__":
 
     # Schedule the script to run every 24 hours
     while True:
-        delete_folders(Constants.ZIP_FILES_DIRECTORY, Constants.XML_FILES_DIRECTORY)
+        delete_folders(constants.ZIP_FILES_DIRECTORY, constants.XML_FILES_DIRECTORY)
         for script_name in script_names:
             run_script(script_name)
-        print("the script is finished")
-        time.sleep(86400)  # Sleep for 24 hours (24 * 60 * 60 seconds)
+        print(f"Finished extracting data, sleeping for {constants.TIME_TO_SLEEP}")
+        time.sleep(constants.TIME_TO_SLEEP)  # Sleep for 24 hours (24 * 60 * 60 seconds)

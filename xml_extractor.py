@@ -2,16 +2,16 @@ import gzip
 import os
 import shutil
 
-import Constants
+import constants
 
 
 def unzip_xml_files(directory, supermarket, file):
     zip_path = os.path.join(directory, file)
     xml_file_name = file.split('.gz')[0] + '.xml'
-    xml_folder_path = os.path.join(Constants.XML_FILES_DIRECTORY, supermarket)
+    xml_folder_path = os.path.join(constants.XML_FILES_DIRECTORY, supermarket)
     if not os.path.exists(xml_folder_path):
         os.makedirs(xml_folder_path)
-    xml_file_path = os.path.join(Constants.XML_FILES_DIRECTORY, supermarket, xml_file_name)
+    xml_file_path = os.path.join(constants.XML_FILES_DIRECTORY, supermarket, xml_file_name)
     if zip_path.endswith('xml'):
         shutil.copy(str(zip_path), str(xml_folder_path))
     else:
@@ -27,7 +27,7 @@ def unzip_xml_files(directory, supermarket, file):
 
 
 def main():
-    zip_directory = Constants.ZIP_FILES_DIRECTORY
+    zip_directory = constants.ZIP_FILES_DIRECTORY
     for supermarket in os.listdir(zip_directory):
         supermarket_path = os.path.join(zip_directory, supermarket)
         for filename in os.listdir(supermarket_path):
