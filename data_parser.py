@@ -108,9 +108,7 @@ def add_lat_lng(parsed_super_markets):
 
 
 def geocode_address(address: str, city: str, api_key: str):
-
     full_address = f"{address}" if city is None else f"{city} {address}"
-
     endpoint = os.getenv("GOOGLE_MAPS_URL")
     params = {'address': full_address, 'key': api_key}
     response = requests.get(endpoint, params=params)
