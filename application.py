@@ -2,7 +2,6 @@ import os
 import shutil
 import subprocess
 import time
-
 import Constants
 
 
@@ -40,4 +39,5 @@ if __name__ == "__main__":
         delete_folders(Constants.ZIP_FILES_DIRECTORY, Constants.XML_FILES_DIRECTORY)
         for script_name in script_names:
             run_script(script_name)
+        print("the script is finished")
         time.sleep(86400)  # Sleep for 24 hours (24 * 60 * 60 seconds)
