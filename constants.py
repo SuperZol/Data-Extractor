@@ -1,5 +1,6 @@
 URL = "url"
 NAME = "name"
+TIME_TO_SLEEP = 86400
 ZIP_FILES_DIRECTORY = "./zip_files"
 XML_FILES_DIRECTORY = "./xml_files"
 DATE_FORMAT = "%Y%m%d"
