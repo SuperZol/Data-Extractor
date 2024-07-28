@@ -9,6 +9,14 @@ current_dir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(current_dir, './.env'))
 
 
+def get_category(product_name):
+    for key, value_list in constants.CATEGORIES.items():
+        for value in value_list:
+            if value in product_name:
+                return key
+    return "כללי"
+
+
 def parsing(elements, element, supermarket, store_id=None):
     items = []
     flag = False
@@ -25,6 +33,8 @@ def parsing(elements, element, supermarket, store_id=None):
                         data[key] = value
                     if key == "Address" and "co." in value:
                         flag = True
+                    if key == "ItemName":
+                        data["Category"] = get_category(value)
                 if store_id is not None:
                     data["StoreId"] = store_id.text.strip()
 
