@@ -1,3 +1,4 @@
+import time
 import xml.etree.ElementTree as Etree
 import constants
 from database import products_collection, super_markets_collection
@@ -95,6 +96,8 @@ def parse_xml_data(xml_files_directory):
 
 
 def store_data(parsed_prices, parsed_promos, parsed_super_markets):
+    products_collection.delete_many({})
+    super_markets_collection.delete_many({})
     if len(parsed_prices) > 0:
         products_collection.insert_many(parsed_prices)
     if len(parsed_super_markets) > 0:
