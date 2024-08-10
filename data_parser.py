@@ -1,12 +1,24 @@
+import os
 import xml.etree.ElementTree as Etree
 import constants
-from database import products_collection, super_markets_collection
 import requests
-import os
 from dotenv import load_dotenv
+from pymongo import MongoClient, errors as pymongo_errors
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(current_dir, './.env'))
+
+mongoURI = os.getenv('MONGO_URI')
+client = MongoClient(mongoURI,
+                     maxPoolSize=50,
+                     waitQueueTimeoutMS=60000,
+                     connectTimeoutMS=60000,
+                     socketTimeoutMS=60000
+                     )
+
+db = client[os.getenv('MONGODB_DATABASE')]
+products_collection = db[os.getenv('MONGODB_PRODUCTS_COLLECTION')]
+super_markets_collection = db[os.getenv('MONGODB_SUPER_MARKETS_COLLECTION')]
 
 
 def get_category(product_name):
@@ -90,15 +102,8 @@ def parse_xml_data(xml_files_directory):
                 parsed_promos += parse_promos(xml_tree, supermarket)
             if filename.startswith('Stores'):
                 parsed_super_markets += parse_super_markets(xml_tree, supermarket)
-                add_lat_lng(parsed_super_markets)
+    add_lat_lng(parsed_super_markets)
     return parsed_prices, parsed_promos, parsed_super_markets
-
-
-def store_data(parsed_prices, parsed_promos, parsed_super_markets):
-    if len(parsed_prices) > 0:
-        products_collection.insert_many(parsed_prices)
-    if len(parsed_super_markets) > 0:
-        super_markets_collection.insert_many(parsed_super_markets)
 
 
 def add_lat_lng(parsed_super_markets):
@@ -118,15 +123,61 @@ def add_lat_lng(parsed_super_markets):
 
 
 def geocode_address(address: str, city: str, api_key: str):
-    full_address = f"{address}" if city is None else f"{city} {address}"
+    full_address = f"{city} {address}" if city else address
     endpoint = os.getenv("GOOGLE_MAPS_URL")
     params = {'address': full_address, 'key': api_key}
-    response = requests.get(endpoint, params=params)
-    data = response.json()
-    if data['status'] == 'OK':
-        location = data['results'][0]['geometry']['location']
-        return location['lat'], location['lng']
+    try:
+        response = requests.get(endpoint, params=params)
+        data = response.json()
+        if data['status'] == 'OK':
+            location = data['results'][0]['geometry']['location']
+            return location['lat'], location['lng']
+    except requests.RequestException as e:
+        print(f"Error fetching geocode data: {e}")
     return None, None
+
+
+def delete_in_batches(collection, batch_size):
+    total_deleted = 0
+    while True:
+        try:
+            documents = list(collection.find().limit(batch_size))
+            if not documents:
+                break  # Exit if there are no more documents to delete
+
+            ids_to_delete = [doc['_id'] for doc in documents]
+            collection.delete_many({'_id': {'$in': ids_to_delete}})
+            total_deleted += len(ids_to_delete)
+            print(f"Deleted {len(ids_to_delete)} documents, total deleted: {total_deleted}")
+        except pymongo_errors.PyMongoError as e:
+            print(f"An error occurred during deletion: {e}")
+
+
+def store_data(parsed_prices, parsed_promos, parsed_super_markets):
+    delete_in_batches(products_collection, batch_size=70000)
+    delete_in_batches(super_markets_collection, batch_size=80000)
+
+    batch_size = 80000
+    if parsed_prices:
+        bulk_insert(products_collection, parsed_prices, batch_size)
+
+    if parsed_super_markets:
+        bulk_insert(super_markets_collection, parsed_super_markets, batch_size)
+
+
+def bulk_insert(collection, data, batch_size):
+    try:
+        for i in range(0, len(data), batch_size):
+            batch = data[i:i + batch_size]
+            try:
+                collection.insert_many(batch, ordered=False)
+            except pymongo_errors.BulkWriteError as e:
+                print(f"Encountered {len(e.details['writeErrors'])} errors during insertion.")
+            except pymongo_errors.AutoReconnect:
+                print(f"Reconnecting and retrying batch {i // batch_size + 1}")
+                collection.insert_many(batch, ordered=False)
+    except pymongo_errors.PyMongoError as e:
+        print(f"An error occurred during bulk insertion: {e}")
 
 
 def main():
